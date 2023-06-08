@@ -1,4 +1,4 @@
-import React, {useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from 'styled-components'
 
@@ -17,13 +17,12 @@ const Character = ({ characterId }) => {
       try {
         const response = await axios.get(`https://swapi.dev/api/people/${characterId}`);
         setCharacter(response.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
         // Set the flag to allow rendering after a delay of 2 seconds
         timer = setTimeout(() => {
           setShouldRender(true);
         }, 2000);
+      } catch (error) {
+        console.error(error);
       }
     };
 
@@ -34,20 +33,17 @@ const Character = ({ characterId }) => {
     };
   }, [characterId]);
 
-  if (!shouldRender) {
-    return null; // Do not render the component until the delay is completed
-  }
-
   if (!character) {
-    return <div>Error: Failed to fetch character data.</div>; // Render an error state if character data is null
+    return <div>Loading...</div>; // Render a loading state while fetching the data
   }
 
-  return (
+  return shouldRender ? (
     <CharacterWrapper>
       <p>{character.name}</p>
     </CharacterWrapper>
-  );
+  ) : null;
 };
+
 
 const CharacterList = () => {
   const characters = [1, 2, 3, 4, 5, 6, 7, 8, 9];
