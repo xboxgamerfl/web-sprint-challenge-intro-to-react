@@ -8,25 +8,39 @@ const CharacterWrapper = styled.div`
 
 const Character = ({ characterId }) => {
   const [character, setCharacter] = useState(null);
+  const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
+    let timer;
+
     const fetchData = async () => {
       try {
         const response = await axios.get(`https://swapi.dev/api/people/${characterId}`);
-        console.log(response.data);
         setCharacter(response.data);
       } catch (error) {
         console.error(error);
+      } finally {
+        // Set the flag to allow rendering after a delay of 2 seconds
+        timer = setTimeout(() => {
+          setShouldRender(true);
+        }, 2000);
       }
     };
 
     fetchData();
 
     return () => {
-      isMounted = false; // Update the flag when the component is unmounted
+      clearTimeout(timer); // Clear the timer if the component is unmounted before it expires
     };
   }, [characterId]);
+
+  if (!shouldRender) {
+    return null; // Do not render the component until the delay is completed
+  }
+
+  if (!character) {
+    return <div>Error: Failed to fetch character data.</div>; // Render an error state if character data is null
+  }
 
   return (
     <CharacterWrapper>
